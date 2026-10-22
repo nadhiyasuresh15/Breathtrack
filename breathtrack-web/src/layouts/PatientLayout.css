@@ -241,3 +241,123 @@
         padding-bottom: 80px;
     }
 }
+
+/* ── Premium Alarm Popup Overlay ───────────────── */
+.alarm-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.alarm-popup-card {
+    background: var(--bt-surface, #ffffff);
+    width: 90%;
+    max-width: 400px;
+    padding: 32px;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    transform: scale(0.9) translateY(20px);
+    animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.alarm-popup-header {
+    margin-bottom: 20px;
+}
+
+.alarm-lungs-icon {
+    font-size: 54px;
+    display: inline-block;
+    animation: lungsPulse 2s ease-in-out infinite;
+}
+
+.alarm-popup-card h3 {
+    margin: 0 0 12px 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--bt-text-primary, #1e293b);
+    letter-spacing: -0.5px;
+}
+
+.alarm-popup-card p {
+    margin: 0 0 28px 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--bt-text-second, #64748b);
+}
+
+.alarm-popup-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.alarm-btn {
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.alarm-btn.taken {
+    background: #1a6b8a;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(26, 107, 138, 0.2);
+}
+
+.alarm-btn.taken:hover {
+    background: #15556e;
+    transform: translateY(-1px);
+}
+
+.alarm-btn.dismiss {
+    background: var(--bt-surface2, #f1f5f9);
+    color: var(--bt-text-second, #64748b);
+}
+
+.alarm-btn.dismiss:hover {
+    background: #e2e8f0;
+    color: var(--bt-text-primary, #1e293b);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes lungsPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+}

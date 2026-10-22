@@ -30,16 +30,16 @@ try {
     $q7 = $data["q7_sleep_quality"] ?? null;
     $q8 = $data["q8_energy_level"] ?? null;
 
-    $answers = [$q1,$q2,$q3,$q4,$q5,$q6,$q7,$q8];
-    $validAnswers = array_filter($answers,'is_numeric');
-    $average_score = count($validAnswers)>0 ? round(array_sum($validAnswers)/count($validAnswers),2) : 0;
+    $answers = [$q1, $q2, $q3, $q4, $q5, $q6, $q7, $q8];
+    $validAnswers = array_filter($answers, 'is_numeric');
+    $average_score = count($validAnswers) > 0 ? round(array_sum($validAnswers) / count($validAnswers), 2) : 0;
 
     // Check if patient already submitted
     $check = $conn->prepare("SELECT * FROM questionnaires WHERE patient_id = :pid LIMIT 1");
-    $check->execute([':pid'=>$patient_id]);
+    $check->execute([':pid' => $patient_id]);
     $existing = $check->fetch(PDO::FETCH_ASSOC);
 
-    if($existing){
+    if ($existing) {
         $update = $conn->prepare("
             UPDATE questionnaires SET
                 date_pneumococcal=:dp,date_flu=:df,date_pertussis=:dpe,
@@ -51,15 +51,24 @@ try {
             WHERE patient_id=:pid
         ");
         $update->execute([
-            ':pid'=>$patient_id,
-            ':dp'=>$date_pneumococcal,':df'=>$date_flu,':dpe'=>$date_pertussis,
-            ':ds1'=>$date_shingles1,':ds2'=>$date_shingles2,
-            ':q1'=>$q1,':q2'=>$q2,':q3'=>$q3,':q4'=>$q4,
-            ':q5'=>$q5,':q6'=>$q6,':q7'=>$q7,':q8'=>$q8,
-            ':avg'=>$average_score
+            ':pid' => $patient_id,
+            ':dp' => $date_pneumococcal,
+            ':df' => $date_flu,
+            ':dpe' => $date_pertussis,
+            ':ds1' => $date_shingles1,
+            ':ds2' => $date_shingles2,
+            ':q1' => $q1,
+            ':q2' => $q2,
+            ':q3' => $q3,
+            ':q4' => $q4,
+            ':q5' => $q5,
+            ':q6' => $q6,
+            ':q7' => $q7,
+            ':q8' => $q8,
+            ':avg' => $average_score
         ]);
 
-        echo json_encode(["status"=>"success","message"=>"Questionnaire updated","patient_id"=>$patient_id,"average_score"=>$average_score]);
+        echo json_encode(["status" => "success", "message" => "Questionnaire updated", "patient_id" => $patient_id, "average_score" => $average_score]);
     } else {
         $insert = $conn->prepare("
             INSERT INTO questionnaires (
@@ -75,18 +84,27 @@ try {
             )
         ");
         $insert->execute([
-            ':pid'=>$patient_id,
-            ':dp'=>$date_pneumococcal,':df'=>$date_flu,':dpe'=>$date_pertussis,
-            ':ds1'=>$date_shingles1,':ds2'=>$date_shingles2,
-            ':q1'=>$q1,':q2'=>$q2,':q3'=>$q3,':q4'=>$q4,
-            ':q5'=>$q5,':q6'=>$q6,':q7'=>$q7,':q8'=>$q8,
-            ':avg'=>$average_score
+            ':pid' => $patient_id,
+            ':dp' => $date_pneumococcal,
+            ':df' => $date_flu,
+            ':dpe' => $date_pertussis,
+            ':ds1' => $date_shingles1,
+            ':ds2' => $date_shingles2,
+            ':q1' => $q1,
+            ':q2' => $q2,
+            ':q3' => $q3,
+            ':q4' => $q4,
+            ':q5' => $q5,
+            ':q6' => $q6,
+            ':q7' => $q7,
+            ':q8' => $q8,
+            ':avg' => $average_score
         ]);
 
-        echo json_encode(["status"=>"success","message"=>"Questionnaire submitted","patient_id"=>$patient_id,"average_score"=>$average_score]);
+        echo json_encode(["status" => "success", "message" => "Questionnaire submitted", "patient_id" => $patient_id, "average_score" => $average_score]);
     }
 
-} catch(PDOException $e){
-    echo json_encode(["status"=>"error","message"=>$e->getMessage()]);
+} catch (PDOException $e) {
+    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
 }
 ?>

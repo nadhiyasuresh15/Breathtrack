@@ -21,7 +21,9 @@ struct VideosUploading: View {
     // MARK: - Body
     var body: some View {
         ZStack {
-            Color.black.opacity(0.5)
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .overlay(Color.black.opacity(0.25))
                 .ignoresSafeArea()
                 .onTapGesture { if !isUploading { dismiss() } }
 
@@ -42,13 +44,12 @@ struct VideosUploading: View {
         VStack(spacing: 0) {
             // Top gradient accent bar
             LinearGradient.btDoctorGradient
-                .frame(height: 4)
-                .clipShape(RoundedCornerShape(corners: [.topLeft, .topRight], radius: 24))
+                .frame(height: 5)
 
-            VStack(spacing: 20) {
+            VStack(spacing: 24) {
                 header
                 modeTabs
-                Divider().opacity(0.4)
+                Divider().opacity(0.3)
 
                 if uploadDone {
                     successView
@@ -61,11 +62,11 @@ struct VideosUploading: View {
                 }
             }
             .padding(24)
-            .background(Color.btSurface)
-            .clipShape(RoundedCornerShape(corners: [.bottomLeft, .bottomRight], radius: 24))
         }
-        .shadow(color: .black.opacity(0.25), radius: 40, x: 0, y: 16)
-        .scaleEffect(appeared ? 1 : 0.92)
+        .background(Color.btSurface)
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .shadow(color: Color.black.opacity(0.12), radius: 30, x: 0, y: 15)
+        .scaleEffect(appeared ? 1 : 0.94)
         .opacity(appeared ? 1 : 0)
     }
 
@@ -74,12 +75,12 @@ struct VideosUploading: View {
         HStack(spacing: 14) {
             // Icon
             ZStack {
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: 14)
                     .fill(LinearGradient.btDoctorGradient)
-                    .frame(width: 52, height: 52)
-                    .shadow(color: Color.btDoctorPrimary.opacity(0.4), radius: 8, x: 0, y: 4)
-                Image(systemName: "arrow.up.to.line.circle.fill")
-                    .font(.system(size: 24, weight: .semibold))
+                    .frame(width: 48, height: 48)
+                    .shadow(color: Color.btDoctorPrimary.opacity(0.3), radius: 6, x: 0, y: 3)
+                Image(systemName: "icloud.and.arrow.up.fill")
+                    .font(.system(size: 20, weight: .bold))
                     .foregroundColor(.white)
             }
 
@@ -104,6 +105,7 @@ struct VideosUploading: View {
                         .foregroundColor(.btTextSecond)
                 }
             }
+            .buttonStyle(.plain)
         }
     }
 
@@ -118,15 +120,15 @@ struct VideosUploading: View {
                         resetFields()
                     }
                 } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: tab == .youtube ? "link.circle.fill" : "internaldrive.fill")
-                            .font(.system(size: 13, weight: .semibold))
-                        Text(tab == .youtube ? "Link via YouTube" : "Local Video File")
-                            .font(.system(size: 13, weight: .semibold))
+                    HStack(spacing: 8) {
+                        Image(systemName: tab == .youtube ? "video.badge.plus" : "folder.badge.plus")
+                            .font(.system(size: 14, weight: .bold))
+                        Text(tab == .youtube ? "Link YouTube" : "Local Video")
+                            .font(.system(size: 14, weight: .semibold))
                     }
                     .foregroundColor(isActive ? .white : .btTextSecond)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 38)
+                    .frame(height: 40)
                     .background(
                         Group {
                             if isActive {
@@ -136,15 +138,15 @@ struct VideosUploading: View {
                             }
                         }
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
                 .buttonStyle(.plain)
             }
         }
         .padding(4)
         .background(Color.btBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.btBorder.opacity(0.6), lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color.btBorder.opacity(0.6), lineWidth: 1))
     }
 
     // MARK: - Form Content Switch
@@ -160,11 +162,11 @@ struct VideosUploading: View {
 
     // MARK: - YouTube Form
     private var youtubeForm: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 18) {
             iconInputField(
                 label: "Video Title",
                 placeholder: "e.g. Inhaler Usage Guide",
-                icon: "text.cursor",
+                icon: "square.and.pencil",
                 text: $title
             )
             iconInputField(
@@ -191,11 +193,11 @@ struct VideosUploading: View {
 
     // MARK: - Local Form
     private var localForm: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 18) {
             iconInputField(
                 label: "Video Title",
                 placeholder: "e.g. Breathing Exercise Demo",
-                icon: "text.cursor",
+                icon: "square.and.pencil",
                 text: $title
             )
 
@@ -221,36 +223,37 @@ struct VideosUploading: View {
         text: Binding<String>,
         keyboardType: UIKeyboardType = .default
     ) -> some View {
-        VStack(alignment: .leading, spacing: 7) {
+        VStack(alignment: .leading, spacing: 8) {
             Text(label)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 11, weight: .bold))
                 .foregroundColor(.btTextSecond)
-                .textCase(.uppercase)
-                .tracking(0.5)
+                .tracking(0.8)
 
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.btDoctorPrimary.opacity(0.7))
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(text.wrappedValue.isEmpty ? .btTextSecond : .btDoctorPrimary)
                     .frame(width: 20)
+                    .animation(.easeInOut(duration: 0.2), value: text.wrappedValue.isEmpty)
 
                 TextField(placeholder, text: text)
-                    .font(.system(size: 15))
+                    .font(.system(size: 15, weight: .medium))
                     .foregroundColor(.btTextPrimary)
                     .keyboardType(keyboardType)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
             }
-            .padding(.horizontal, 14)
-            .frame(height: 48)
+            .padding(.horizontal, 16)
+            .frame(height: 52)
             .background(Color.btBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 13))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
             .overlay(
-                RoundedRectangle(cornerRadius: 13)
+                RoundedRectangle(cornerRadius: 14)
                     .strokeBorder(
-                        text.wrappedValue.isEmpty ? Color.btBorder : Color.btDoctorPrimary.opacity(0.5),
+                        text.wrappedValue.isEmpty ? Color.btBorder : Color.btDoctorPrimary.opacity(0.6),
                         lineWidth: 1.2
                     )
+                    .animation(.easeInOut(duration: 0.2), value: text.wrappedValue.isEmpty)
             )
         }
     }
@@ -266,21 +269,25 @@ struct VideosUploading: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 120)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .frame(height: 125)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.btBorder, lineWidth: 1)
+            )
 
             HStack(spacing: 5) {
                 Image(systemName: "play.fill")
-                    .font(.system(size: 10))
-                Text("YouTube Preview")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.system(size: 8, weight: .bold))
+                Text("YouTube Video Preview")
+                    .font(.system(size: 10, weight: .bold))
             }
             .foregroundColor(.white)
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
-            .background(Color.black.opacity(0.55))
+            .background(Color.btDoctorPrimary)
             .clipShape(Capsule())
-            .padding(8)
+            .padding(10)
         }
         .transition(.scale(scale: 0.95).combined(with: .opacity))
     }
@@ -291,15 +298,14 @@ struct VideosUploading: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(selectedVideoData != nil
-                          ? Color.btDoctorPrimary.opacity(0.06)
+                          ? Color.btDoctorPrimary.opacity(0.04)
                           : Color.btBackground)
+                
                 RoundedRectangle(cornerRadius: 16)
                     .strokeBorder(
-                        style: StrokeStyle(lineWidth: 1.5, dash: selectedVideoData != nil ? [] : [6, 4])
+                        selectedVideoData != nil ? Color.btDoctorPrimary.opacity(0.4) : Color.btBorder,
+                        style: StrokeStyle(lineWidth: 1.5, dash: selectedVideoData != nil ? [] : [5, 4])
                     )
-                    .foregroundColor(selectedVideoData != nil
-                                     ? Color.btDoctorPrimary.opacity(0.6)
-                                     : Color.btBorder)
 
                 if selectedVideoData != nil {
                     HStack(spacing: 12) {
@@ -312,10 +318,10 @@ struct VideosUploading: View {
                                 .foregroundStyle(LinearGradient.btDoctorGradient)
                         }
                         VStack(alignment: .leading, spacing: 3) {
-                            Text("Video Ready")
+                            Text("Video Selected")
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundColor(.btDoctorPrimary)
-                            Text(selectedVideoName.isEmpty ? "Tap to change" : selectedVideoName)
+                            Text(selectedVideoName.isEmpty ? "Tap to change file" : selectedVideoName)
                                 .font(.system(size: 12))
                                 .foregroundColor(.btTextSecond)
                                 .lineLimit(1)
@@ -323,32 +329,32 @@ struct VideosUploading: View {
                         Spacer()
                         Image(systemName: "pencil.circle.fill")
                             .font(.system(size: 20))
-                            .foregroundColor(.btDoctorPrimary.opacity(0.4))
+                            .foregroundColor(.btDoctorPrimary.opacity(0.5))
                     }
                     .padding(.horizontal, 16)
                 } else {
-                    VStack(spacing: 10) {
+                    VStack(spacing: 12) {
                         ZStack {
                             Circle()
-                                .fill(Color.btDoctorPrimary.opacity(0.10))
-                                .frame(width: 54, height: 54)
-                            Image(systemName: "arrow.up.circle.fill")
-                                .font(.system(size: 28))
+                                .fill(Color.btDoctorPrimary.opacity(0.08))
+                                .frame(width: 52, height: 52)
+                            Image(systemName: "video.badge.plus.fill")
+                                .font(.system(size: 22))
                                 .foregroundStyle(LinearGradient.btDoctorGradient)
                         }
                         VStack(spacing: 4) {
-                            Text("Tap to select a video")
-                                .font(.system(size: 14, weight: .semibold))
+                            Text("Select Video File")
+                                .font(.system(size: 14, weight: .bold))
                                 .foregroundColor(.btTextPrimary)
-                            Text("MP4, MOV, AVI, MKV  ·  Max 300MB")
-                                .font(.system(size: 12))
+                            Text("MP4, MOV  ·  Max 300MB")
+                                .font(.system(size: 11, weight: .medium))
                                 .foregroundColor(.btTextSecond)
                         }
                     }
-                    .padding(.vertical, 22)
+                    .padding(.vertical, 20)
                 }
             }
-            .frame(height: 120)
+            .frame(height: 130)
         }
         .onChange(of: selectedVideo) { _, _ in loadSelectedVideo() }
     }
@@ -406,45 +412,47 @@ struct VideosUploading: View {
         disabled: Bool = false
     ) -> some View {
         HStack(spacing: 12) {
-            Button("Cancel") { if !isUploading { dismiss() } }
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(.btTextSecond)
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(Color.btBackground)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-                .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.btBorder, lineWidth: 1))
+            Button(action: { if !isUploading { dismiss() } }) {
+                Text("Cancel")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(.btTextSecond)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(Color.btBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .buttonStyle(.plain)
 
             Button(action: onSubmit) {
                 HStack(spacing: 7) {
                     if isUploading {
                         ProgressView().tint(.white).scaleEffect(0.85)
-                        Text("Working…")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.white)
+                        Text("Publishing…")
+                            .font(.system(size: 15, weight: .bold))
                     } else {
                         Image(systemName: submitIcon)
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.system(size: 15, weight: .bold))
                         Text(submitLabel)
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.system(size: 15, weight: .bold))
                     }
                 }
                 .foregroundColor(.white)
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: 50)
-            .background(
-                Group {
-                    if disabled || isUploading {
-                        AnyView(Color.gray.opacity(0.25))
-                    } else {
-                        AnyView(LinearGradient.btDoctorGradient)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(
+                    Group {
+                        if disabled || isUploading {
+                            AnyView(Color.btTextTertiary.opacity(0.3))
+                        } else {
+                            AnyView(LinearGradient.btDoctorGradient)
+                        }
                     }
-                }
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 14))
-            .shadow(color: disabled || isUploading ? .clear : Color.btDoctorPrimary.opacity(0.35),
-                    radius: 8, x: 0, y: 4)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(color: disabled || isUploading ? .clear : Color.btDoctorPrimary.opacity(0.25),
+                        radius: 8, x: 0, y: 4)
+            }
+            .buttonStyle(.plain)
             .disabled(disabled || isUploading)
         }
     }

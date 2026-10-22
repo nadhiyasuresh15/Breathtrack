@@ -307,8 +307,17 @@ struct SearchPatientReportsView: View {
     }
     
     private func parseRecord(_ dict: [String: Any], type: ReportType, baseURL: String) -> UnifiedReport? {
-        guard let id = dict["id"] as? Int,
-              let condition = dict["condition"] as? String,
+        let rawId = dict["id"]
+        let idString: String
+        if let intVal = rawId as? Int {
+            idString = String(intVal)
+        } else if let strVal = rawId as? String {
+            idString = strVal
+        } else {
+            return nil
+        }
+
+        guard let condition = dict["condition"] as? String,
               let created = dict["created_at"] as? String else { return nil }
         
         var imgUrl: URL? = nil
@@ -336,12 +345,21 @@ struct SearchPatientReportsView: View {
             timeStr = tFormatter.string(from: date)
         }
         
-        return UnifiedReport(id: "\(type)-\(id)", type: type, condition: condition, comments: comments, walkDescription: "", imageURL: imgUrl, createdAt: created, dateObj: dateObj, dateString: dateStr, timeString: timeStr)
+        return UnifiedReport(id: "\(type)-\(idString)", type: type, condition: condition, comments: comments, walkDescription: "", imageURL: imgUrl, createdAt: created, dateObj: dateObj, dateString: dateStr, timeString: timeStr)
     }
     
     private func parseWalkRecord(_ dict: [String: Any]) -> UnifiedReport? {
-        guard let id = dict["id"] as? Int,
-              let description = dict["description"] as? String,
+        let rawId = dict["id"]
+        let idString: String
+        if let intVal = rawId as? Int {
+            idString = String(intVal)
+        } else if let strVal = rawId as? String {
+            idString = strVal
+        } else {
+            return nil
+        }
+
+        guard let description = dict["description"] as? String,
               let created = dict["created_at"] as? String else { return nil }
         
         let dbFormatter = DateFormatter()
@@ -361,7 +379,7 @@ struct SearchPatientReportsView: View {
             timeStr = tFormatter.string(from: date)
         }
         
-        return UnifiedReport(id: "walk-\(id)", type: .walkTest, condition: "", comments: "", walkDescription: description, imageURL: nil, createdAt: created, dateObj: dateObj, dateString: dateStr, timeString: timeStr)
+        return UnifiedReport(id: "walk-\(idString)", type: .walkTest, condition: "", comments: "", walkDescription: description, imageURL: nil, createdAt: created, dateObj: dateObj, dateString: dateStr, timeString: timeStr)
     }
 }
 

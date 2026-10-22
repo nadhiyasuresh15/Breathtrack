@@ -228,6 +228,7 @@ struct patientlogin: View {
                             withAnimation { message = "Sign In successful!"; messageStatus = .success }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                                 session.login(pid: pid, name: name, age: age, gender: gender, occupation: occupation)
+                                LocalNotificationManager.shared.syncRemindersFromServer(patientId: pid)
                             }
                         } else {
                             withAnimation {

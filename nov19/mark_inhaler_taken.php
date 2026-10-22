@@ -22,10 +22,10 @@ $date_taken = $input['date_taken'];
 try {
     $query = "INSERT IGNORE INTO inhaler_adherence (patient_id, date_taken) VALUES (:patient_id, :date_taken)";
     $stmt = $db->prepare($query);
-    
+
     $stmt->bindParam(':patient_id', $patient_id);
     $stmt->bindParam(':date_taken', $date_taken);
-    
+
     if ($stmt->execute()) {
         echo json_encode(["status" => "success", "message" => "Inhaler marked as taken"]);
     } else {

@@ -7,11 +7,10 @@ import {
     Wind, FileText, Activity, PersonStanding
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { apiCall } from '../../api/apiService';
+import { apiCall, BASE_URL } from '../../api/apiService';
 import BTPrimaryButton from '../../components/BTPrimaryButton';
 import './Medications.css';
 
-const REMINDER_KEY = 'bt_vaccine_reminders';
 
 interface Report {
     id: string;
@@ -62,7 +61,15 @@ const Medications: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
 
-    const today = new Date().toISOString().split('T')[0];
+    const getLocalDateString = () => {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const today = getLocalDateString();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -87,11 +94,58 @@ const Medications: React.FC = () => {
                     setReports(allReports);
                 }
 
-                // Check local state
-                const today = new Date().toISOString().split('T')[0];
-                setIsTakenToday(!!localStorage.getItem(`inhaler_taken_${user.id}_${today}`));
-                setAlarmTime(localStorage.getItem(`inhaler_alarm_${user.id}`) || "09:00");
-                setRefillDate(localStorage.getItem(`inhaler_refill_${user.id}`) || "");
+                // Sync status from server
+                let isTaken = false;
+                try {
+                    const inhalerHistory = await apiCall('get_inhaler_history.php', 'POST', { patient_id: user.id });
+                    if (inhalerHistory.status === 'success' && Array.isArray(inhalerHistory.taken_dates)) {
+                        if (inhalerHistory.taken_dates.includes(today)) {
+                            isTaken = true;
+                            localStorage.setItem(`inhaler_taken_${user.id}_${today}`, 'true');
+                        }
+                    }
+                } catch (historyErr) {
+                    console.error("Failed to fetch inhaler history from server", historyErr);
+                }
+
+                // Try local state as fallback
+                if (!isTaken) {
+                    isTaken = localStorage.getItem(`inhaler_taken_${user.id}_${today}`) === 'true';
+                }
+
+                // Fetch Reminders to sync alarmTime and refillDate
+                let serverAlarmTime = "09:00";
+                let serverRefillDate = "";
+                try {
+                    const remindersResult = await apiCall('get_reminders.php', 'POST', { patient_id: user.id });
+                    if (remindersResult.status === 'success' && Array.isArray(remindersResult.reminders)) {
+                        const dailyAlarm = remindersResult.reminders.find((r: any) => r.id === 'inhaler_daily_alarm');
+                        if (dailyAlarm) {
+                            serverAlarmTime = dailyAlarm.alarmTime;
+                            localStorage.setItem(`inhaler_alarm_${user.id}`, dailyAlarm.alarmTime);
+                        } else {
+                            serverAlarmTime = localStorage.getItem(`inhaler_alarm_${user.id}`) || "09:00";
+                        }
+                        const refillAlarm = remindersResult.reminders.find((r: any) => r.id === 'inhaler_refill');
+                        if (refillAlarm) {
+                            serverRefillDate = refillAlarm.dueDate;
+                            localStorage.setItem(`inhaler_refill_${user.id}`, refillAlarm.dueDate);
+                        } else {
+                            serverRefillDate = localStorage.getItem(`inhaler_refill_${user.id}`) || "";
+                        }
+                    } else {
+                        serverAlarmTime = localStorage.getItem(`inhaler_alarm_${user.id}`) || "09:00";
+                        serverRefillDate = localStorage.getItem(`inhaler_refill_${user.id}`) || "";
+                    }
+                } catch (remindersErr) {
+                    console.error("Failed to fetch reminders from server", remindersErr);
+                    serverAlarmTime = localStorage.getItem(`inhaler_alarm_${user.id}`) || "09:00";
+                    serverRefillDate = localStorage.getItem(`inhaler_refill_${user.id}`) || "";
+                }
+
+                setIsTakenToday(isTaken);
+                setAlarmTime(serverAlarmTime);
+                setRefillDate(serverRefillDate);
 
             } catch (error) {
                 console.error("Failed to fetch data", error);
@@ -102,17 +156,26 @@ const Medications: React.FC = () => {
         fetchData();
     }, [user]);
 
-    const syncToGlobalReminders = (reminder: VaccineReminder) => {
+    useEffect(() => {
+        const handleInhalerStatusUpdate = () => {
+            if (!user) return;
+            const updatedTaken = localStorage.getItem(`inhaler_taken_${user.id}_${today}`) === 'true';
+            setIsTakenToday(updatedTaken);
+        };
+        window.addEventListener('inhaler-status-updated', handleInhalerStatusUpdate);
+        return () => window.removeEventListener('inhaler-status-updated', handleInhalerStatusUpdate);
+    }, [user, today]);
+
+    const syncToGlobalReminders = async (reminder: VaccineReminder) => {
         if (!user) return;
-        const all = JSON.parse(localStorage.getItem(REMINDER_KEY) || '{}');
-        const list: VaccineReminder[] = all[user.id] || [];
-
-        // Remove existing with same ID and add new
-        const filtered = list.filter(r => r.id !== reminder.id);
-        filtered.push(reminder);
-
-        all[user.id] = filtered;
-        localStorage.setItem(REMINDER_KEY, JSON.stringify(all));
+        try {
+            await apiCall('save_reminder.php', 'POST', {
+                patient_id: user.id,
+                ...reminder
+            });
+        } catch (err) {
+            console.error("Failed to save reminder to server", err);
+        }
     };
 
     const formatTime12h = (time24: string) => {
@@ -168,11 +231,10 @@ const Medications: React.FC = () => {
 
     const handleMarkAsTaken = async () => {
         if (!user) return;
-        const today = new Date().toISOString().split('T')[0];
         setShowSuccess(true);
         setIsTakenToday(true);
         localStorage.setItem(`inhaler_taken_${user.id}_${today}`, 'true');
-        await apiCall('mark_inhaler_taken.php', 'POST', { patient_id: user.id });
+        await apiCall('mark_inhaler_taken.php', 'POST', { patient_id: user.id, date_taken: today });
         setTimeout(() => setShowSuccess(false), 3000);
     };
 
@@ -246,7 +308,7 @@ const Medications: React.FC = () => {
                                                         {report.image_path ? (
                                                             <button
                                                                 className="doc-link-btn"
-                                                                onClick={() => window.open(`http://localhost/nov19/${report.image_path}`, '_blank')}
+                                                                onClick={() => window.open(`${BASE_URL}/${report.image_path}`, '_blank')}
                                                             >
                                                                 <FileText size={14} />
                                                                 View Document

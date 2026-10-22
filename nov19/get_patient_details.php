@@ -18,7 +18,7 @@ try {
     }
 
     // ✅ Fetch basic details
-    $stmt1 = $conn->prepare("SELECT patient_id, name, age, gender, height, weight, diagnosis, occupation 
+    $stmt1 = $conn->prepare("SELECT patient_id, name, age, gender, height, weight, diagnosis, occupation, phone_number 
                              FROM patients WHERE patient_id = :pid");
     $stmt1->execute([':pid' => $patient_id]);
     $patient = $stmt1->fetch(PDO::FETCH_ASSOC);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     Bell, BellOff, Syringe, Calendar, Clock,
-    Trash2, X, CheckCircle, Wind, AlertTriangle
+    Trash2, X, CheckCircle, XCircle, Wind, AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { apiCall } from '../../api/apiService';
@@ -10,14 +10,6 @@ import './Reminders.css';
 
 const REMINDER_KEY = 'bt_vaccine_reminders';
 
-function loadReminders(patientId: string): VaccineReminder[] {
-    try {
-        const all = JSON.parse(localStorage.getItem(REMINDER_KEY) || '{}');
-        return all[patientId] || [];
-    } catch {
-        return [];
-    }
-}
 
 function saveReminders(patientId: string, reminders: VaccineReminder[]) {
     const all = JSON.parse(localStorage.getItem(REMINDER_KEY) || '{}');
@@ -113,37 +105,54 @@ const Reminders: React.FC = () => {
     useEffect(() => {
         setAppeared(true);
         if (!user) { setLoading(false); return; }
-        const loaded = loadReminders(user.id);
-        // Sort by due date
-        loaded.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
-        setReminders(loaded);
 
-        // Fetch appointment details
-        apiCall('get_appointment.php', 'POST', { patient_id: user.id })
-            .then(res => {
-                if (res.status === 'success' && res.appointment) {
-                    setAppointment(res.appointment);
+        setLoading(true);
+        // Fetch reminders and appointment details in parallel
+        Promise.all([
+            apiCall('get_reminders.php', 'POST', { patient_id: user.id }),
+            apiCall('get_appointment.php', 'POST', { patient_id: user.id })
+        ])
+            .then(([remindersRes, apptRes]) => {
+                if (remindersRes.status === 'success' && Array.isArray(remindersRes.reminders)) {
+                    const loaded = remindersRes.reminders;
+                    loaded.sort((a: any, b: any) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+                    setReminders(loaded);
+                }
+                if (apptRes.status === 'success' && apptRes.appointment) {
+                    setAppointment(apptRes.appointment);
                 }
             })
-            .catch(() => { })
+            .catch((err) => {
+                console.error("Failed to load reminders or appointments details", err);
+            })
             .finally(() => setLoading(false));
     }, [user]);
 
-    const cancelReminder = (id: string) => {
+    const cancelReminder = async (id: string) => {
         if (!user) return;
         const updated = reminders.filter(r => r.id !== id);
         setReminders(updated);
-        saveReminders(user.id, updated);
+        try {
+            await apiCall('delete_reminder.php', 'POST', { patient_id: user.id, id });
+            saveReminders(user.id, updated);
+        } catch (err) {
+            console.error("Failed to delete reminder from server", err);
+        }
     };
 
-    const clearAll = () => {
+    const clearAll = async () => {
         if (!user) return;
         setReminders([]);
-        saveReminders(user.id, []);
         setShowClearConfirm(false);
+        try {
+            await apiCall('clear_reminders.php', 'POST', { patient_id: user.id });
+            saveReminders(user.id, []);
+        } catch (err) {
+            console.error("Failed to clear reminders from server", err);
+        }
     };
 
-    const hasContent = reminders.length > 0 || appointment?.status?.toLowerCase() === 'accepted';
+    const hasContent = reminders.length > 0 || appointment?.status?.toLowerCase() === 'accepted' || appointment?.status?.toLowerCase() === 'rejected';
 
     return (
         <div className={`reminders-page ${appeared ? 'appeared' : ''}`}>
@@ -202,6 +211,23 @@ const Reminders: React.FC = () => {
                                     <div className="reminder-meta">
                                         <Calendar size={12} />
                                         <span>Confirmed for {formatDueDate(appointment.preferred_date)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Appointment rejected notification */}
+                        {appointment?.status?.toLowerCase() === 'rejected' && (
+                            <div className="reminder-appt-card rejected">
+                                <div className="reminder-icon-box rejected-icon">
+                                    <XCircle size={22} color="#ef4444" />
+                                </div>
+                                <div className="reminder-info">
+                                    <h4>Appointment Rejected</h4>
+                                    <p>Unfortunately, your doctor has declined your appointment request for <strong>{formatDueDate(appointment.preferred_date)}</strong> at <strong>{appointment.preferred_time}</strong>. Please reschedule or contact your clinic.</p>
+                                    <div className="reminder-meta">
+                                        <Calendar size={12} />
+                                        <span className="overdue">Requested for {formatDueDate(appointment.preferred_date)}</span>
                                     </div>
                                 </div>
                             </div>

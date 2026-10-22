@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     ChevronLeft, Check, Loader2,
-    Save, Pill
+    Save, Pill, CheckCircle2, AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiCall } from '../../api/apiService';
@@ -29,6 +29,9 @@ const Medication: React.FC = () => {
 
     const [remarks, setRemarks] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    const [showErrorPopup, setShowErrorPopup] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const toggleMedicine = (medId: string) => {
         setMedicines(prev => prev.map(m =>
@@ -39,7 +42,8 @@ const Medication: React.FC = () => {
     const handleSubmit = async () => {
         const selectedMeds = medicines.filter(m => m.isSelected).map(m => m.name);
         if (selectedMeds.length === 0 && !remarks.trim()) {
-            alert('Please select at least one medicine or enter remarks.');
+            setErrorMessage('Please select at least one medicine or enter remarks.');
+            setShowErrorPopup(true);
             return;
         }
 
@@ -52,14 +56,15 @@ const Medication: React.FC = () => {
             });
 
             if (res.status === 'success') {
-                alert('Medication Plan Saved Successfully!');
-                navigate(`/doctor/patients/${id}`);
+                setShowSuccessPopup(true);
             } else {
-                alert('Error: ' + res.message);
+                setErrorMessage(res.message || 'Error occurred while saving medication.');
+                setShowErrorPopup(true);
             }
         } catch (err) {
             console.error('Submission failed', err);
-            alert('Failed to save medication plan.');
+            setErrorMessage('Failed to save medication plan.');
+            setShowErrorPopup(true);
         } finally {
             setIsSubmitting(false);
         }
@@ -135,6 +140,51 @@ const Medication: React.FC = () => {
                     )}
                 </button>
             </div>
+
+            {showSuccessPopup && (
+                <div className="sr-popup-overlay">
+                    <div className="sr-popup-card">
+                        <div className="sr-popup-icon" style={{ backgroundColor: 'rgba(52, 201, 138, 0.12)', color: '#34C98A' }}>
+                            <CheckCircle2 size={36} />
+                        </div>
+                        <h3>Prescription Saved Successfully!</h3>
+                        <p>Patient medication settings and diary guidelines have been updated.</p>
+                        <div className="sr-popup-actions">
+                            <button
+                                className="sr-popup-btn confirm"
+                                style={{ backgroundColor: '#34C98A' }}
+                                onClick={() => {
+                                    setShowSuccessPopup(false);
+                                    navigate(`/doctor/patients/${id}`);
+                                }}
+                            >
+                                Done
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showErrorPopup && (
+                <div className="sr-popup-overlay" onClick={() => setShowErrorPopup(false)}>
+                    <div className="sr-popup-card" onClick={(e) => e.stopPropagation()}>
+                        <div className="sr-popup-icon" style={{ backgroundColor: 'rgba(255, 107, 107, 0.12)', color: '#FF6B6B' }}>
+                            <AlertCircle size={36} />
+                        </div>
+                        <h3>Action Required</h3>
+                        <p>{errorMessage}</p>
+                        <div className="sr-popup-actions">
+                            <button
+                                className="sr-popup-btn confirm"
+                                style={{ backgroundColor: '#34C98A' }}
+                                onClick={() => setShowErrorPopup(false)}
+                            >
+                                Dismiss
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

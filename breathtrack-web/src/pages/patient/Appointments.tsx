@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, User, CheckCircle } from 'lucide-react';
 import BTPrimaryButton from '../../components/BTPrimaryButton';
 import { apiCall } from '../../api/apiService';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import './Appointments.css';
 
 // ── Success Popup ──────────────────────────────────────
@@ -39,6 +40,28 @@ const Appointments: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const { user } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchPatientDetails = async () => {
+            if (!user) return;
+            try {
+                const res = await apiCall('get_patient_details.php', 'POST', { patient_id: user.id });
+                if (res.status === 'success' && res.patient) {
+                    setFormData(prev => ({
+                        ...prev,
+                        name: res.patient.name || '',
+                        age: res.patient.age ? String(res.patient.age) : '',
+                        gender: res.patient.gender || '',
+                        contact: res.patient.phone_number || ''
+                    }));
+                }
+            } catch (error) {
+                console.error("Failed to fetch patient details:", error);
+            }
+        };
+        fetchPatientDetails();
+    }, [user]);
 
     const symptomList = ["Shortness of breath", "Persistent cough", "Wheezing", "Chest tightness", "Fatigue"];
 
@@ -86,7 +109,14 @@ const Appointments: React.FC = () => {
 
     return (
         <div className="booking-form-view">
-            {showSuccess && <SuccessPopup onOk={() => setShowSuccess(false)} />}
+            {showSuccess && (
+                <SuccessPopup
+                    onOk={() => {
+                        setShowSuccess(false);
+                        navigate('/patient/dashboard');
+                    }}
+                />
+            )}
             <header className="form-header">
                 <div className="header-text">
                     <h1>Book Appointment</h1>

@@ -7,7 +7,7 @@ struct APIConfig {
     // Ensure your XAMPP or MAMP is running and `breathtrack` is in the htdocs folder.
 //    static let baseURL = "http://14.139.187.229:8081/breathtrack"
 
-    static let baseURL = "http://localhost/nov19" // Also try localhost:8081 if port is required
+    static let baseURL = "http://103.249.82.251:8080/breathtrack_%20192311084"
     static func getURL(for endpoint: String) -> URL? {
         return URL(string: "\(baseURL)/\(endpoint)")
     }

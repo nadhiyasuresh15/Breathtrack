@@ -262,14 +262,20 @@ struct VaccinationView: View {
                 let cal = Calendar.current
                 let pId = self.session.current?.patient_id ?? "unknown"
                 let vaccineIdentifiers = [
-                    "vaccine_flu",
-                    "vaccine_pneumo",
-                    "vaccine_pertussis",
+                    "vaccine_flu_vaccine",
+                    "vaccine_pneumococcal_vaccination",
+                    "vaccine_pertussis_vaccine",
                     "vaccine_shingles"
                 ]
                 vaccineIdentifiers.forEach { id in
-                    LocalNotificationManager.shared.cancelNotification(identifier: id, patientId: pId)
+                    LocalNotificationManager.shared.cancelNotification(identifier: id, patientId: pId, syncToServer: false)
                 }
+
+                var remindersPayload: [[String: Any]] = []
+                let ymdFmt = DateFormatter()
+                ymdFmt.dateFormat = "yyyy-MM-dd"
+                let hmFmt = DateFormatter()
+                hmFmt.dateFormat = "HH:mm"
 
                 // 🫁 FLU VACCINE → Remind every 1 year from vaccination date
                 LocalNotificationManager.shared.ensureAuthorization { granted in
@@ -283,9 +289,19 @@ struct VaccinationView: View {
                             for: alarmDate,
                             title: "Flu Vaccine Due 💉",
                             body: "It has been 1 year since your Flu Shot. Time to get your next one!",
-                            identifier: "vaccine_flu",
-                            patientId: pId
+                            identifier: "vaccine_flu_vaccine",
+                            patientId: pId,
+                            syncToServer: false
                         )
+                        remindersPayload.append([
+                            "id": "vaccine_flu_vaccine",
+                            "title": "Flu Vaccine Due 💉",
+                            "body": "It has been 1 year since your Flu Shot. Time to get your next one!",
+                            "dueDate": ymdFmt.string(from: nextDue),
+                            "alarmTime": hmFmt.string(from: alarmDate),
+                            "icon": "syringe.fill",
+                            "color": "#10b981"
+                        ])
                     }
                     
                     // 🫁 PNEUMOCOCCAL → Remind in 5 years (PPSV23 booster check for COPD patients)
@@ -296,9 +312,19 @@ struct VaccinationView: View {
                             for: alarmDate,
                             title: "Pneumococcal Vaccine Check 💉",
                             body: "It has been 5 years since your Pneumococcal (PPSV23) Vaccine. COPD patients may need a booster — please consult your doctor.",
-                            identifier: "vaccine_pneumo",
-                            patientId: pId
+                            identifier: "vaccine_pneumococcal_vaccination",
+                            patientId: pId,
+                            syncToServer: false
                         )
+                        remindersPayload.append([
+                            "id": "vaccine_pneumococcal_vaccination",
+                            "title": "Pneumococcal Vaccine Check 💉",
+                            "body": "It has been 5 years since your Pneumococcal (PPSV23) Vaccine. COPD patients may need a booster — please consult your doctor.",
+                            "dueDate": ymdFmt.string(from: nextDue),
+                            "alarmTime": hmFmt.string(from: alarmDate),
+                            "icon": "syringe.fill",
+                            "color": "#10b981"
+                        ])
                     }
                     
                     // 🫁 PERTUSSIS → Remind every 10 years from vaccination date
@@ -309,9 +335,19 @@ struct VaccinationView: View {
                             for: alarmDate,
                             title: "Pertussis Booster Due 💉",
                             body: "It has been 10 years since your Pertussis Vaccine. Time for a booster shot!",
-                            identifier: "vaccine_pertussis",
-                            patientId: pId
+                            identifier: "vaccine_pertussis_vaccine",
+                            patientId: pId,
+                            syncToServer: false
                         )
+                        remindersPayload.append([
+                            "id": "vaccine_pertussis_vaccine",
+                            "title": "Pertussis Booster Due 💉",
+                            "body": "It has been 10 years since your Pertussis Vaccine. Time for a booster shot!",
+                            "dueDate": ymdFmt.string(from: nextDue),
+                            "alarmTime": hmFmt.string(from: alarmDate),
+                            "icon": "syringe.fill",
+                            "color": "#10b981"
+                        ])
                     }
                     
                     // 🫁 SHINGLES →
@@ -327,8 +363,18 @@ struct VaccinationView: View {
                                 title: "Shingles Dose 2 Due 💉",
                                 body: "It has been 6 months since your first Shingles (Shingrix) dose. Time to get your second and final dose!",
                                 identifier: "vaccine_shingles",
-                                patientId: pId
+                                patientId: pId,
+                                syncToServer: false
                             )
+                            remindersPayload.append([
+                                "id": "vaccine_shingles",
+                                "title": "Shingles Dose 2 Due 💉",
+                                "body": "It has been 6 months since your first Shingles (Shingrix) dose. Time to get your second and final dose!",
+                                "dueDate": ymdFmt.string(from: dose2Due),
+                                "alarmTime": hmFmt.string(from: alarmDate),
+                                "icon": "syringe.fill",
+                                "color": "#10b981"
+                            ])
                         } else {
                             // ✅ Both doses complete → Remind in 5 years for immunity review
                             // Shingrix immunity may wane; COPD patients should consult doctor
@@ -339,10 +385,22 @@ struct VaccinationView: View {
                                 title: "Shingles Immunity Review 💉",
                                 body: "It has been 5 years since your Shingles (Shingrix) series. Immunity may be waning — please consult your doctor for a booster evaluation.",
                                 identifier: "vaccine_shingles",
-                                patientId: pId
+                                patientId: pId,
+                                syncToServer: false
                             )
+                            remindersPayload.append([
+                                "id": "vaccine_shingles",
+                                "title": "Shingles Immunity Review 💉",
+                                "body": "It has been 5 years since your Shingles (Shingrix) series. Immunity may be waning — please consult your doctor for a booster evaluation.",
+                                "dueDate": ymdFmt.string(from: reviewDue),
+                                "alarmTime": hmFmt.string(from: alarmDate),
+                                "icon": "syringe.fill",
+                                "color": "#10b981"
+                            ])
                         }
                     }
+                    
+                    LocalNotificationManager.shared.syncSaveVaccineReminders(reminders: remindersPayload, patientId: pId)
                 }
                 
                 showSuccessAlert = true 

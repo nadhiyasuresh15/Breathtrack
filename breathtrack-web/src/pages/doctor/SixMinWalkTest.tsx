@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     ChevronLeft, Activity, Send, Loader2,
-    FileText
+    FileText, CheckCircle2, AlertCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { apiCall } from '../../api/apiService';
@@ -14,10 +14,14 @@ const SixMinWalkTest: React.FC = () => {
 
     const [description, setDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    const [showErrorPopup, setShowErrorPopup] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleSubmit = async () => {
         if (!description.trim()) {
-            alert('Please enter the report description.');
+            setErrorMessage('Please enter the report description.');
+            setShowErrorPopup(true);
             return;
         }
 
@@ -29,14 +33,15 @@ const SixMinWalkTest: React.FC = () => {
             });
 
             if (res.status === 'success') {
-                alert('6 Min Walk Test report saved successfully!');
-                navigate(`/doctor/patients/${id}`);
+                setShowSuccessPopup(true);
             } else {
-                alert('Error: ' + res.message);
+                setErrorMessage(res.message || 'Error occurred while saving walk test.');
+                setShowErrorPopup(true);
             }
         } catch (err) {
             console.error('Submission failed', err);
-            alert('Failed to save report.');
+            setErrorMessage('Failed to save report.');
+            setShowErrorPopup(true);
         } finally {
             setIsSubmitting(false);
         }
@@ -98,6 +103,51 @@ const SixMinWalkTest: React.FC = () => {
                     )}
                 </button>
             </div>
+
+            {showSuccessPopup && (
+                <div className="sr-popup-overlay">
+                    <div className="sr-popup-card">
+                        <div className="sr-popup-icon" style={{ backgroundColor: 'rgba(52, 201, 138, 0.12)', color: '#34C98A' }}>
+                            <CheckCircle2 size={36} />
+                        </div>
+                        <h3>Save Successful!</h3>
+                        <p>The 6-Minute Walk Test report has been recorded safely in the database.</p>
+                        <div className="sr-popup-actions">
+                            <button
+                                className="sr-popup-btn confirm"
+                                style={{ backgroundColor: '#1A6B8A' }}
+                                onClick={() => {
+                                    setShowSuccessPopup(false);
+                                    navigate(`/doctor/patients/${id}`);
+                                }}
+                            >
+                                Done
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showErrorPopup && (
+                <div className="sr-popup-overlay" onClick={() => setShowErrorPopup(false)}>
+                    <div className="sr-popup-card" onClick={(e) => e.stopPropagation()}>
+                        <div className="sr-popup-icon" style={{ backgroundColor: 'rgba(255, 107, 107, 0.12)', color: '#FF6B6B' }}>
+                            <AlertCircle size={36} />
+                        </div>
+                        <h3>Action Required</h3>
+                        <p>{errorMessage}</p>
+                        <div className="sr-popup-actions">
+                            <button
+                                className="sr-popup-btn confirm"
+                                style={{ backgroundColor: '#1A6B8A' }}
+                                onClick={() => setShowErrorPopup(false)}
+                            >
+                                Dismiss
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

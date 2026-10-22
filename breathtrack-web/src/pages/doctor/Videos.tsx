@@ -52,9 +52,11 @@ const DoctorVideos: React.FC = () => {
     const fetchVideos = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${BASE_URL}/video.php`);
+            const res = await fetch(`${BASE_URL}/upload_video.php`);
             const data = await res.json();
-            if (data.status === 'success') setVideos(data.videos || []);
+            if (data.status === 'success') {
+                setVideos(data.videos || []);
+            }
         } catch (e) {
             console.error(e);
         }
@@ -87,7 +89,7 @@ const DoctorVideos: React.FC = () => {
             formData.append('action', 'add_url');
             formData.append('title', ytTitle);
             formData.append('video_url', ytUrl);
-            const res = await fetch(`${BASE_URL}/video.php`, { method: 'POST', body: formData });
+            const res = await fetch(`${BASE_URL}/upload_video.php`, { method: 'POST', body: formData });
             const data = await res.json();
             if (data.status === 'success') {
                 setUploadDone(true);
@@ -110,7 +112,7 @@ const DoctorVideos: React.FC = () => {
 
         // XHR for upload progress
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${BASE_URL}/video.php`, true);
+        xhr.open('POST', `${BASE_URL}/upload_video.php`, true);
 
         xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {
@@ -133,7 +135,18 @@ const DoctorVideos: React.FC = () => {
         xhr.send(formData);
     };
 
-    const handleDelete = (id: number) => setVideos(v => v.filter(x => x.id !== id));
+    const handleDelete = async (id: number) => {
+        setVideos(v => v.filter(x => x.id !== id));
+        try {
+            const formData = new FormData();
+            formData.append('action', 'delete');
+            formData.append('video_id', String(id));
+            await fetch(`${BASE_URL}/upload_video.php`, { method: 'POST', body: formData });
+        } catch (e) {
+            console.error('Failed to delete video:', e);
+            fetchVideos(); // Re-fetch if delete failed
+        }
+    };
 
     return (
         <div className="vl-page">

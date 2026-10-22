@@ -163,3 +163,38 @@
         transform: rotate(360deg);
     }
 }
+
+.ios-edit-btn,
+.ios-save-btn {
+    background: transparent;
+    border: none;
+    color: #7B6CF6;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px 12px;
+    transition: opacity 0.2s;
+}
+
+.ios-edit-btn:hover,
+.ios-save-btn:hover {
+    opacity: 0.8;
+}
+
+.ios-profile-input {
+    border: none;
+    border-bottom: 2px solid #e2e8f0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    padding: 2px 0;
+    outline: none;
+    background: transparent;
+    width: 250px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.ios-profile-input:focus {
+    border-bottom-color: #7B6CF6;
+}

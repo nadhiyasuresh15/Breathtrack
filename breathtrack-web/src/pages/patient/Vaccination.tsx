@@ -141,9 +141,22 @@ const Vaccination: React.FC = () => {
         const fetchExisting = async () => {
             if (!user) return;
 
-            // Load existing reminders from localStorage to preserve alarm preferences
-            const allReminders = JSON.parse(localStorage.getItem(REMINDER_KEY) || '{}');
-            const patientReminders: VaccineReminder[] = allReminders[user.id] || [];
+            // Load existing reminders from backend, fallback to localStorage
+            let patientReminders: VaccineReminder[] = [];
+            try {
+                const remindersRes = await apiCall('get_reminders.php', 'POST', { patient_id: user.id });
+                if (remindersRes.status === 'success' && Array.isArray(remindersRes.reminders)) {
+                    patientReminders = remindersRes.reminders;
+                }
+            } catch (e) {
+                console.error("Failed to fetch reminders from server", e);
+            }
+
+            if (patientReminders.length === 0) {
+                const allReminders = JSON.parse(localStorage.getItem(REMINDER_KEY) || '{}');
+                patientReminders = allReminders[user.id] || [];
+            }
+
             const findStored = (idPrefix: string) => patientReminders.find(r => r.id.startsWith(idPrefix));
 
             const res = await apiCall('get_patient_details.php', 'POST', { patient_id: user.id });
@@ -249,13 +262,23 @@ const Vaccination: React.FC = () => {
             date_shingles2: (shinglesTaken && shinglesD2Taken) ? shinglesD2 : 'N/A',
         };
         const res = await apiCall('save_vaccine_dates.php', 'POST', payload);
-        setLoading(false);
         if (res.status === 'success') {
-            // Save reminders to localStorage
+            // Save reminders to backend
             const reminders = buildReminders();
-            saveReminders(user.id, reminders);
+            try {
+                await apiCall('save_reminders.php', 'POST', {
+                    patient_id: user.id,
+                    reminders: reminders
+                });
+                // Also write locally as a cache fallback
+                saveReminders(user.id, reminders);
+            } catch (err) {
+                console.error("Failed to save reminders to database", err);
+            }
+            setLoading(false);
             setShowSuccess(true);
         } else {
+            setLoading(false);
             alert('Failed to save vaccination dates');
         }
     };

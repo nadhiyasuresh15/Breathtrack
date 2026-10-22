@@ -16,6 +16,133 @@ const PatientLayout: React.FC<PatientLayoutProps> = ({ children }) => {
     const location = useLocation();
     const [hasUpdate, setHasUpdate] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [inhalerAlarmTime, setInhalerAlarmTime] = useState<string | null>(null);
+    const [showAlarmPopup, setShowAlarmPopup] = useState(false);
+
+    useEffect(() => {
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    }, []);
+
+    const getLocalDateString = () => {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const handleMarkTaken = async () => {
+        if (!user?.id) return;
+        const today = getLocalDateString();
+        localStorage.setItem(`inhaler_taken_${user.id}_${today}`, 'true');
+        localStorage.removeItem(`inhaler_snooze_until_${user.id}`);
+        window.dispatchEvent(new Event('inhaler-status-updated'));
+        try {
+            await apiCall('mark_inhaler_taken.php', 'POST', { patient_id: user.id, date_taken: today });
+        } catch (err) {
+            console.error("Failed to mark inhaler taken from layout:", err);
+        }
+        setShowAlarmPopup(false);
+    };
+
+    const handleRemindLater = () => {
+        if (!user?.id) return;
+        // Snooze for 5 minutes (in milliseconds)
+        const snoozeTarget = Date.now() + 5 * 60 * 1000;
+        localStorage.setItem(`inhaler_snooze_until_${user.id}`, String(snoozeTarget));
+        setShowAlarmPopup(false);
+    };
+
+    useEffect(() => {
+        if (!user?.id) return;
+        const localVal = localStorage.getItem(`inhaler_alarm_${user.id}`);
+        if (localVal) {
+            setInhalerAlarmTime(localVal);
+        } else {
+            apiCall('get_reminders.php', 'POST', { patient_id: user.id })
+                .then(res => {
+                    if (res.status === 'success' && Array.isArray(res.reminders)) {
+                        const daily = res.reminders.find((r: any) => r.id === 'inhaler_daily_alarm');
+                        if (daily && daily.alarmTime) {
+                            setInhalerAlarmTime(daily.alarmTime);
+                            localStorage.setItem(`inhaler_alarm_${user.id}`, daily.alarmTime);
+                        }
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+    }, [user]);
+
+    useEffect(() => {
+        if (!user?.id) return;
+        let isChecking = false;
+
+        const checkTime = async () => {
+            if (isChecking) return;
+
+            const currentAlarmTime = localStorage.getItem(`inhaler_alarm_${user.id}`) || inhalerAlarmTime;
+            const now = new Date();
+            const todayStr = now.toDateString();
+            const todayDateStr = getLocalDateString();
+
+            const isTaken = localStorage.getItem(`inhaler_taken_${user.id}_${todayDateStr}`) === 'true';
+            if (isTaken) {
+                localStorage.removeItem(`inhaler_snooze_until_${user.id}`);
+                return;
+            }
+
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const currentTime = `${hours}:${minutes}`;
+
+            // Check normal alarm trigger
+            const isAlarmTime = currentAlarmTime && currentTime === currentAlarmTime;
+            const lastAlerted = localStorage.getItem(`last_inhaler_alert_${user.id}`);
+            const shouldAlertAlarm = isAlarmTime && (lastAlerted !== todayStr);
+
+            // Check snooze trigger
+            const snoozeUntil = localStorage.getItem(`inhaler_snooze_until_${user.id}`);
+            const shouldAlertSnooze = snoozeUntil && Date.now() >= Number(snoozeUntil);
+
+            if (shouldAlertAlarm || shouldAlertSnooze) {
+                // Verify with backend before showing popup — user may have tapped "Taken" on mobile
+                isChecking = true;
+                try {
+                    const res = await apiCall('get_inhaler_history.php', 'POST', { patient_id: user.id });
+                    if (res.status === 'success' && res.taken_dates?.includes(todayDateStr)) {
+                        // User already took it on another device!
+                        localStorage.setItem(`inhaler_taken_${user.id}_${todayDateStr}`, 'true');
+                        localStorage.removeItem(`inhaler_snooze_until_${user.id}`);
+                        isChecking = false;
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Failed to sync inhaler status', e);
+                }
+                isChecking = false;
+
+                setShowAlarmPopup(true);
+                localStorage.setItem(`last_inhaler_alert_${user.id}`, todayStr);
+
+                // Clear the snooze trigger so it does not fire repeatedly
+                localStorage.removeItem(`inhaler_snooze_until_${user.id}`);
+
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification("Daily Inhaler Reminder 🫁", {
+                        body: "It's time to take your daily inhaler dose for better breathing.",
+                        tag: "inhaler-alarm"
+                    });
+                }
+            }
+        };
+
+        const interval = setInterval(checkTime, 10000);
+        checkTime();
+
+        return () => clearInterval(interval);
+    }, [user, inhalerAlarmTime]);
 
     const handleLogout = () => {
         logout();
@@ -101,6 +228,26 @@ const PatientLayout: React.FC<PatientLayoutProps> = ({ children }) => {
                 onClose={() => setShowLogoutModal(false)}
                 onConfirm={handleLogout}
             />
+
+            {showAlarmPopup && (
+                <div className="alarm-popup-overlay">
+                    <div className="alarm-popup-card">
+                        <div className="alarm-popup-header">
+                            <span className="alarm-lungs-icon">🫁</span>
+                        </div>
+                        <h3>Daily Inhaler Time!</h3>
+                        <p>It's time to take your daily inhaler dose for better breathing and symptom management.</p>
+                        <div className="alarm-popup-actions">
+                            <button className="alarm-btn taken" onClick={handleMarkTaken}>
+                                I've Taken It
+                            </button>
+                            <button className="alarm-btn dismiss" onClick={handleRemindLater}>
+                                Remind Me Later
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Main Content Area */}
             <main className="main-container">

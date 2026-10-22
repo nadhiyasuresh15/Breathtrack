@@ -91,8 +91,8 @@ struct PatientSignUp: View {
                                     VStack(alignment: .leading, spacing: 4) {
                                         BTInputField(placeholder: "Full Name", icon: "person.fill", text: $patientName)
                                             .textInputAutocapitalization(.words)
-                                        if !patientName.isEmpty && patientName.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil {
-                                            Text("Please enter a valid name without numbers")
+                                        if !patientName.isEmpty && patientName.trimmingCharacters(in: .whitespaces).count < 3 {
+                                            Text("Min 3 characters required")
                                                 .font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, Spacing.md)
                                         }
                                     }
@@ -101,8 +101,10 @@ struct PatientSignUp: View {
                                         VStack(alignment: .leading, spacing: 4) {
                                             BTInputField(placeholder: "Age", icon: "calendar", text: $age)
                                                 .keyboardType(.numberPad)
-                                            if !age.isEmpty && Int(age.trimmingCharacters(in: .whitespaces)) == nil {
-                                                Text("Numbers only").font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, 8)
+                                            if !age.isEmpty {
+                                                if let ageInt = Int(age), ageInt < 1 || ageInt > 120 {
+                                                    Text("Age must be 1 to 120").font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, 8)
+                                                }
                                             }
                                         }
                                         
@@ -112,16 +114,16 @@ struct PatientSignUp: View {
                                     VStack(alignment: .leading, spacing: 4) {
                                         BTInputField(placeholder: "Occupation", icon: "briefcase.fill", text: $occupation)
                                             .textInputAutocapitalization(.words)
-                                        if !occupation.isEmpty && occupation.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil {
-                                            Text("Please enter a valid occupation").font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, Spacing.md)
+                                        if !occupation.isEmpty && occupation.trimmingCharacters(in: .whitespaces).count < 2 {
+                                            Text("Min 2 characters required").font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, Spacing.md)
                                         }
                                     }
                                     
                                     VStack(alignment: .leading, spacing: 4) {
                                         BTInputField(placeholder: "Phone Number", icon: "phone.fill", text: $phoneNumber)
                                             .keyboardType(.phonePad)
-                                        if !phoneNumber.isEmpty && (phoneNumber.count < 10 || Int(phoneNumber) == nil) {
-                                            Text("Enter a valid phone number").font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, Spacing.md)
+                                        if !phoneNumber.isEmpty && phoneNumber.count != 10 {
+                                            Text("Must be exactly 10 digits").font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, Spacing.md)
                                         }
                                     }
                                 }
@@ -133,16 +135,20 @@ struct PatientSignUp: View {
                                         VStack(alignment: .leading, spacing: 4) {
                                             BTInputField(placeholder: "Height (cm)", icon: "arrow.up.and.down", text: $height)
                                                 .keyboardType(.decimalPad)
-                                            if !height.isEmpty && Double(height.trimmingCharacters(in: .whitespaces)) == nil {
-                                                Text("Numbers only").font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, 8)
+                                            if !height.isEmpty {
+                                                if let heightVal = Double(height), heightVal < 30 || heightVal > 300 {
+                                                    Text("Enter valid height (30-300 cm)").font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, 8)
+                                                }
                                             }
                                         }
                                         
                                         VStack(alignment: .leading, spacing: 4) {
                                             BTInputField(placeholder: "Weight (kg)", icon: "scalemass.fill", text: $weight)
                                                 .keyboardType(.decimalPad)
-                                            if !weight.isEmpty && Double(weight.trimmingCharacters(in: .whitespaces)) == nil {
-                                                Text("Numbers only").font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, 8)
+                                            if !weight.isEmpty {
+                                                if let weightVal = Double(weight), weightVal < 2 || weightVal > 300 {
+                                                    Text("Enter valid weight (2-300 kg)").font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, 8)
+                                                }
                                             }
                                         }
                                     }
@@ -151,7 +157,7 @@ struct PatientSignUp: View {
                                         BTInputField(placeholder: "Initial Diagnosis", icon: "stethoscope", text: $diagnosis)
                                             .textInputAutocapitalization(.sentences)
                                         if !diagnosis.isEmpty && diagnosis.trimmingCharacters(in: .whitespaces).count < 3 {
-                                            Text("Min 3 characters").font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, Spacing.md)
+                                            Text("Min 3 characters required").font(.btCaption2).foregroundColor(.btAccentOrange).padding(.leading, Spacing.md)
                                         }
                                     }
                                 }
@@ -233,6 +239,52 @@ struct PatientSignUp: View {
                 appeared = true
             }
         }
+        .onChange(of: patientName) { oldValue, newValue in
+            let filtered = newValue.filter { $0.isLetter || $0.isWhitespace }
+            if filtered != newValue {
+                patientName = filtered
+            }
+        }
+        .onChange(of: age) { oldValue, newValue in
+            let filtered = newValue.filter { "0123456789".contains($0) }
+            let limited = String(filtered.prefix(3))
+            if limited != newValue {
+                age = limited
+            }
+        }
+        .onChange(of: occupation) { oldValue, newValue in
+            let filtered = newValue.filter { $0.isLetter || $0.isWhitespace }
+            if filtered != newValue {
+                occupation = filtered
+            }
+        }
+        .onChange(of: phoneNumber) { oldValue, newValue in
+            let filtered = newValue.filter { "0123456789".contains($0) }
+            let limited = String(filtered.prefix(10))
+            if limited != newValue {
+                phoneNumber = limited
+            }
+        }
+        .onChange(of: height) { oldValue, newValue in
+            var filtered = newValue.filter { "0123456789.".contains($0) }
+            let components = filtered.split(separator: ".", omittingEmptySubsequences: false)
+            if components.count > 2 {
+                filtered = String(components[0]) + "." + String(components[1])
+            }
+            if filtered != newValue {
+                height = filtered
+            }
+        }
+        .onChange(of: weight) { oldValue, newValue in
+            var filtered = newValue.filter { "0123456789.".contains($0) }
+            let components = filtered.split(separator: ".", omittingEmptySubsequences: false)
+            if components.count > 2 {
+                filtered = String(components[0]) + "." + String(components[1])
+            }
+            if filtered != newValue {
+                weight = filtered
+            }
+        }
     }
     
     // MARK: - Components
@@ -286,14 +338,22 @@ struct PatientSignUp: View {
     
     // MARK: - API Logic
     private func signUp() {
-        if patientName.trimmingCharacters(in: .whitespaces).isEmpty ||
-            age.trimmingCharacters(in: .whitespaces).isEmpty ||
+        let nameClean = patientName.trimmingCharacters(in: .whitespaces)
+        let ageClean = age.trimmingCharacters(in: .whitespaces)
+        let hClean = height.trimmingCharacters(in: .whitespaces)
+        let wClean = weight.trimmingCharacters(in: .whitespaces)
+        let diagClean = diagnosis.trimmingCharacters(in: .whitespaces)
+        let occClean = occupation.trimmingCharacters(in: .whitespaces)
+        let phoneClean = phoneNumber.trimmingCharacters(in: .whitespaces)
+        
+        if nameClean.isEmpty ||
+            ageClean.isEmpty ||
             gender == "Select Gender" ||
-            height.trimmingCharacters(in: .whitespaces).isEmpty ||
-            weight.trimmingCharacters(in: .whitespaces).isEmpty ||
-            diagnosis.trimmingCharacters(in: .whitespaces).isEmpty ||
-            occupation.trimmingCharacters(in: .whitespaces).isEmpty ||
-            phoneNumber.trimmingCharacters(in: .whitespaces).isEmpty ||
+            hClean.isEmpty ||
+            wClean.isEmpty ||
+            diagClean.isEmpty ||
+            occClean.isEmpty ||
+            phoneClean.isEmpty ||
             password.isEmpty ||
             confirmPassword.isEmpty {
 
@@ -302,17 +362,59 @@ struct PatientSignUp: View {
             return
         }
         
-        let cleanedAge = age.trimmingCharacters(in: .whitespaces)
-        guard let parsedAge = Int(cleanedAge), parsedAge > 0 && parsedAge < 130 else { return }
+        if nameClean.count < 3 {
+            alertMessage = "Full Name must be at least 3 characters."
+            showAlert = true
+            return
+        }
         
-        guard Double(height.trimmingCharacters(in: .whitespaces)) != nil else { return }
-        guard Double(weight.trimmingCharacters(in: .whitespaces)) != nil else { return }
-
-        if password != confirmPassword || password.count < 6 { return }
-        if patientName.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil { return }
-        if occupation.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil { return }
-        if phoneNumber.count < 10 || Int(phoneNumber) == nil { return }
-        if diagnosis.trimmingCharacters(in: .whitespaces).count < 3 { return }
+        guard let parsedAge = Int(ageClean), parsedAge >= 1 && parsedAge <= 120 else {
+            alertMessage = "Age must be a valid number between 1 and 120."
+            showAlert = true
+            return
+        }
+        
+        if occClean.count < 2 {
+            alertMessage = "Occupation must be at least 2 characters."
+            showAlert = true
+            return
+        }
+        
+        if phoneClean.count != 10 {
+            alertMessage = "Phone number must be exactly 10 digits."
+            showAlert = true
+            return
+        }
+        
+        guard let parsedHeight = Double(hClean), parsedHeight >= 30 && parsedHeight <= 300 else {
+            alertMessage = "Height must be a valid number between 30 and 300 cm."
+            showAlert = true
+            return
+        }
+        
+        guard let parsedWeight = Double(wClean), parsedWeight >= 2 && parsedWeight <= 300 else {
+            alertMessage = "Weight must be a valid number between 2 and 300 kg."
+            showAlert = true
+            return
+        }
+        
+        if diagClean.count < 3 {
+            alertMessage = "Initial Diagnosis must be at least 3 characters."
+            showAlert = true
+            return
+        }
+        
+        if password.count < 6 {
+            alertMessage = "Password must be at least 6 characters."
+            showAlert = true
+            return
+        }
+        
+        if password != confirmPassword {
+            alertMessage = "Passwords do not match."
+            showAlert = true
+            return
+        }
 
         guard let url = APIConfig.getURL(for: "patient_signup.php") else {
             alertMessage = "Invalid URL configuration"

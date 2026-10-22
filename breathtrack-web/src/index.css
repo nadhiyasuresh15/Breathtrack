@@ -148,3 +148,91 @@ body {
   transform: scale(0.97);
   transition: transform 0.1s ease;
 }
+
+/* Global Confirm/Success Popup styles for Doctor Submissions */
+.sr-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(24, 36, 58, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+  animation: popupFadeIn 0.25s ease-out;
+}
+
+.sr-popup-card {
+  background: #ffffff;
+  padding: 2.2rem;
+  border-radius: 28px;
+  width: 90%;
+  max-width: 440px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(24, 36, 58, 0.15);
+  transform: scale(0.9);
+  animation: popupScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes popupFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popupScaleUp {
+  to { transform: scale(1); }
+}
+
+.sr-popup-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 1.2rem auto;
+}
+
+.sr-popup-card h3 {
+  font: var(--font-title3);
+  color: var(--bt-text-primary);
+  margin-bottom: 0.6rem;
+}
+
+.sr-popup-card p {
+  font: var(--font-body);
+  color: var(--bt-text-second);
+  line-height: 1.5;
+  margin-bottom: 1.8rem;
+}
+
+.sr-popup-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.sr-popup-btn {
+  flex: 1;
+  padding: 0.85rem;
+  font: var(--font-headline);
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.sr-popup-btn.cancel {
+  background-color: var(--bt-surface2);
+  color: var(--bt-text-second);
+}
+
+.sr-popup-btn.confirm {
+  color: #ffffff;
+}
+
+.sr-popup-btn:active {
+  transform: scale(0.96);
+}

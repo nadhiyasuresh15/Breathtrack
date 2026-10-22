@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://localhost/nov19'; // Adjust this to your backend URL
+export const BASE_URL = 'http://103.249.82.251:8080/breathtrack_%20192311084'; // Adjust this to your backend URL
 
 export const apiCall = async (endpoint: string, method: string = 'GET', data?: any) => {
     try {

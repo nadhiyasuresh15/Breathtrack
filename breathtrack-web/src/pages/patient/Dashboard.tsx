@@ -109,20 +109,20 @@ const PatientDashboard: React.FC = () => {
                         onClick={() => navigate('/patient/checkup')}
                     />
                     <DashActionCard
+                        title="Vaccination & Questionnaires"
+                        subtitle="Status & history"
+                        icon={<Shield size={32} />}
+                        gradient="linear-gradient(135deg, #FF9B42, #FFB75E)"
+                        index={1}
+                        onClick={() => navigate('/patient/vaccination')}
+                    />
+                    <DashActionCard
                         title="Medical Advice"
                         subtitle="Care plan & Prescriptions"
                         icon={<MessageSquare size={32} />}
                         gradient="linear-gradient(135deg, #7B6CF6, #B1A8FF)"
-                        index={1}
-                        onClick={() => navigate('/patient/advice')}
-                    />
-                    <DashActionCard
-                        title="Vaccination sync"
-                        subtitle="COPD & Vaccine tracking"
-                        icon={<Shield size={32} />}
-                        gradient="linear-gradient(135deg, #FF9B42, #FFB75E)"
                         index={2}
-                        onClick={() => navigate('/patient/vaccination')}
+                        onClick={() => navigate('/patient/advice')}
                     />
                     <DashActionCard
                         title="Pulmonary Rehab"

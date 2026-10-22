@@ -17,6 +17,9 @@ const PftValues: React.FC = () => {
     const [severity, setSeverity] = useState<Severity>(null);
     const [comments, setComments] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    const [showErrorPopup, setShowErrorPopup] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -49,14 +52,15 @@ const PftValues: React.FC = () => {
 
             const res = await apiCall('submit_pft.php', 'POST', payload);
             if (res.status === 'success') {
-                alert('PFT Report Submitted Successfully!');
-                navigate(`/doctor/patients/${id}`);
+                setShowSuccessPopup(true);
             } else {
-                alert('Error: ' + res.message);
+                setErrorMessage(res.message || 'Error from server.');
+                setShowErrorPopup(true);
             }
         } catch (err) {
             console.error('Submission failed', err);
-            alert('Failed to submit report. Please try again.');
+            setErrorMessage('Failed to submit report. Please try again.');
+            setShowErrorPopup(true);
         } finally {
             setIsSubmitting(false);
         }
@@ -163,6 +167,51 @@ const PftValues: React.FC = () => {
                     )}
                 </button>
             </div>
+
+            {showSuccessPopup && (
+                <div className="sr-popup-overlay">
+                    <div className="sr-popup-card">
+                        <div className="sr-popup-icon" style={{ backgroundColor: 'rgba(52, 201, 138, 0.12)', color: '#34C98A' }}>
+                            <CheckCircle2 size={36} />
+                        </div>
+                        <h3>PFT Submission Successful!</h3>
+                        <p>Pulmonary function test parameters have been saved successfully for this patient.</p>
+                        <div className="sr-popup-actions">
+                            <button
+                                className="sr-popup-btn confirm"
+                                style={{ backgroundColor: '#5B4CF5' }}
+                                onClick={() => {
+                                    setShowSuccessPopup(false);
+                                    navigate(`/doctor/patients/${id}`);
+                                }}
+                            >
+                                Done
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showErrorPopup && (
+                <div className="sr-popup-overlay" onClick={() => setShowErrorPopup(false)}>
+                    <div className="sr-popup-card" onClick={(e) => e.stopPropagation()}>
+                        <div className="sr-popup-icon" style={{ backgroundColor: 'rgba(255, 107, 107, 0.12)', color: '#FF6B6B' }}>
+                            <AlertCircle size={36} />
+                        </div>
+                        <h3>Submission Failed</h3>
+                        <p>{errorMessage}</p>
+                        <div className="sr-popup-actions">
+                            <button
+                                className="sr-popup-btn confirm"
+                                style={{ backgroundColor: '#5B4CF5' }}
+                                onClick={() => setShowErrorPopup(false)}
+                            >
+                                Dismiss
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

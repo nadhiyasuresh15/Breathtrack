@@ -112,3 +112,15 @@
         padding: 32px 20px;
     }
 }
+.doctor-banner {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+}
+
+.doctor-overlay {
+    background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z" fill="rgba(255,255,255,0.03)" fill-rule="evenodd"/></svg>') !important;
+}
+
+.doctor-signin-btn {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    border: none !important;
+}

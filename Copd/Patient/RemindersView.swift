@@ -62,7 +62,7 @@ struct RemindersView: View {
                     Spacer()
                     ProgressView().scaleEffect(1.5).tint(.btPrimary)
                     Spacer()
-                } else if alarms.isEmpty && (appointmentStatus?.lowercased() != "accepted") {
+                } else if alarms.isEmpty && (appointmentStatus?.lowercased() != "accepted" && appointmentStatus?.lowercased() != "rejected") {
                     Spacer()
                     VStack(spacing: Spacing.md) {
                         ZStack {
@@ -120,6 +120,39 @@ struct RemindersView: View {
                                 .btCardShadow()
                                 .transition(.move(edge: .top).combined(with: .opacity))
                             }
+                            
+                            if let status = appointmentStatus, status.lowercased() == "rejected" {
+                                HStack(spacing: Spacing.md) {
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 14)
+                                            .fill(Color.btAccentOrange.opacity(0.12))
+                                            .frame(width: 50, height: 50)
+                                        Image(systemName: "calendar.badge.minus")
+                                            .font(.system(size: 22))
+                                            .foregroundColor(.btAccentOrange)
+                                    }
+                                    
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Appointment Rejected")
+                                            .font(.btHeadline)
+                                            .foregroundColor(.btTextPrimary)
+                                        Text("Unfortunately, your doctor declined your appointment request for \(appointmentDate) at \(appointmentTime).")
+                                            .font(.btCaption)
+                                            .foregroundColor(.btTextSecond)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    }
+                                    Spacer()
+                                }
+                                .padding(Spacing.md)
+                                .background(Color.btSurface)
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(Color.btAccentOrange.opacity(0.3), lineWidth: 1)
+                                )
+                                .btCardShadow()
+                                .transition(.move(edge: .top).combined(with: .opacity))
+                            }
 
                             ForEach(Array(alarms.enumerated()), id: \.element.id) { index, alarm in
                                 AlarmCard(alarm: alarm, delay: Double(index) * 0.05) {
@@ -154,11 +187,17 @@ struct RemindersView: View {
             Text("Are you sure you want to remove all scheduled reminders?")
         }
         .onAppear {
+            if let pId = session.current?.patient_id {
+                LocalNotificationManager.shared.syncRemindersFromServer(patientId: pId)
+            }
             loadAlarms()
             fetchAppointmentStatus()
             withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                 appeared = true
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("RemindersSynced"))) { _ in
+            loadAlarms()
         }
     }
     
@@ -264,7 +303,7 @@ struct RemindersView: View {
             return ("syringe.fill", Color.btAccentGreen)
         } else if id == "inhaler_daily_alarm" {
             return ("lungs.fill", Color.btPrimary)
-        } else if id == "inhaler_completed" {
+        } else if id == "inhaler_completed" || id == "inhaler_refill" {
             return ("exclamationmark.triangle.fill", Color.btAccentOrange)
         }
         return ("bell.fill", Color.btPrimary)

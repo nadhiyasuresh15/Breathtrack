@@ -111,6 +111,8 @@
 
 .form-group-web {
     margin-bottom: 24px;
+    width: 100%;
+    min-width: 0;
 }
 
 .form-group-web label {
@@ -190,8 +192,9 @@
 
 .signup-form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0 20px;
+    width: 100%;
 }
 
 .full-width {
@@ -200,12 +203,14 @@
 
 .select-field {
     width: 100%;
+    height: 100%;
     border: none;
     background: transparent;
     font: var(--font-body);
     color: var(--bt-text-primary);
-    padding: 12px;
+    padding: 0;
     outline: none;
+    cursor: pointer;
 }
 
 .success-card {

@@ -42,6 +42,22 @@ try {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
     echo "Videos table verified.\n";
 
+    // Create patient_reminders table if needed
+    $db->exec("CREATE TABLE IF NOT EXISTS `patient_reminders` (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `patient_id` varchar(50) NOT NULL,
+        `reminder_id` varchar(100) NOT NULL,
+        `title` varchar(255) NOT NULL,
+        `body` text NOT NULL,
+        `due_date` varchar(20) NOT NULL,
+        `alarm_time` varchar(10) NOT NULL,
+        `icon` varchar(50) NOT NULL,
+        `color` varchar(50) NOT NULL,
+        UNIQUE KEY `pat_rem_unique` (`patient_id`, `reminder_id`),
+        CONSTRAINT `fk_patient_reminders` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`patient_id`) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+    echo "patient_reminders table verified.\n";
+
     // 4. Cleanup redundant tables
     try {
         $db->exec("DROP TABLE IF EXISTS doctor_profile;");

@@ -229,7 +229,9 @@ struct AboutScreen2: View {
 
     // MARK: - Handlers
     private func handleLogin() {
-        let currentUserId = selectedRole == .patient ? patientUserId : doctorUserId
+        let trimmedPatientId = patientUserId.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedDoctorId = doctorUserId.trimmingCharacters(in: .whitespacesAndNewlines)
+        let currentUserId = selectedRole == .patient ? trimmedPatientId : trimmedDoctorId
         
         guard !currentUserId.isEmpty && !password.isEmpty else {
             withAnimation { message = "Please enter your ID and password."; msgStatus = .warning }
@@ -332,6 +334,7 @@ struct AboutScreen2: View {
                     if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                         if let status = json["status"] as? String, status == "success" {
                             withAnimation { message = "Login successful!"; msgStatus = .success }
+                            UserDefaults.standard.set(id, forKey: "loggedInDoctorId")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 showDoctorDashboard = true
                             }

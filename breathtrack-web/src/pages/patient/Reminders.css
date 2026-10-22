@@ -157,8 +157,16 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
+.reminder-appt-card.rejected {
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
 .reminder-icon-box.appt {
     background: rgba(16, 185, 129, 0.1) !important;
+}
+
+.reminder-icon-box.rejected-icon {
+    background: rgba(239, 68, 68, 0.1) !important;
 }
 
 /* ── Vaccine Reminder Card ────────────────────────────── */

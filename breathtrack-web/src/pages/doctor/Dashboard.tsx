@@ -112,7 +112,7 @@ const DoctorDashboard: React.FC = () => {
                             icon={<FileSearch size={28} />}
                             gradient="linear-gradient(135deg, #FF9B42, #FFB75E)"
                             index={3}
-                            onClick={() => navigate('/doctor/reports')}
+                            onClick={() => navigate('/doctor/search')}
                         />
                         <DashActionCard
                             title="Videos"

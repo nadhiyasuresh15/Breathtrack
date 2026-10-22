@@ -47,7 +47,7 @@ struct PatientDashboardView: View {
                         HStack(spacing: Spacing.md) {
                             DashActionCard(
                                 icon: "doc.text.below.ecg.fill",
-                                title: "Questionnaires",
+                                title: "Vaccination & Questionnaires",
                                 subtitle: "Status & history",
                                 color: Color.btAccentOrange,
                                 gradient: LinearGradient(colors: [Color.btAccentOrange, Color(hex: "FFC371")], startPoint: .topLeading, endPoint: .bottomTrailing),
@@ -240,7 +240,7 @@ struct DashActionCard: View {
                             Text(title)
                                 .font(.btTitle3)
                                 .foregroundColor(.white)
-                                .lineLimit(1)
+                                .lineLimit(2)
                                 .minimumScaleFactor(0.7)
                             Text(subtitle)
                                 .font(.btCaption)

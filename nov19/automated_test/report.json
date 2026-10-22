@@ -4,22 +4,22 @@
     "method": "POST",
     "role": "unauthenticated",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "AuthN Bypass",
-    "note": "Vulnerable: Protected endpoint allowed access with just an ID (unauthenticated).",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:28Z"
   },
   {
     "endpoint": "/submit_questionnaires.php",
     "method": "POST",
     "role": "patient",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "IDOR",
-    "note": "Vulnerable: Accessed another user's data record directly.",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:28Z"
   },
   {
     "endpoint": "/save_patient_review.php",
@@ -30,7 +30,7 @@
     "severity": "Low",
     "test_category": "AuthN Bypass",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "timestamp": "2026-08-05T05:37:28Z"
   },
   {
     "endpoint": "/save_patient_review.php",
@@ -41,7 +41,7 @@
     "severity": "Low",
     "test_category": "IDOR",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "timestamp": "2026-08-05T05:37:28Z"
   },
   {
     "endpoint": "/save_medication_diary.php",
@@ -52,7 +52,7 @@
     "severity": "Low",
     "test_category": "AuthN Bypass",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "timestamp": "2026-08-05T05:37:28Z"
   },
   {
     "endpoint": "/save_medication_diary.php",
@@ -63,73 +63,73 @@
     "severity": "Low",
     "test_category": "IDOR",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "timestamp": "2026-08-05T05:37:28Z"
   },
   {
     "endpoint": "/submit_pft.php",
     "method": "POST",
     "role": "unauthenticated",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "AuthN Bypass",
-    "note": "Vulnerable: Protected endpoint allowed access with just an ID (unauthenticated).",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:28Z"
   },
   {
     "endpoint": "/submit_pft.php",
     "method": "POST",
     "role": "patient",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "IDOR",
-    "note": "Vulnerable: Accessed another user's data record directly.",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:28Z"
   },
   {
     "endpoint": "/get_patient_profile.php",
     "method": "POST",
     "role": "unauthenticated",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "AuthN Bypass",
-    "note": "Vulnerable: Protected endpoint allowed access with just an ID (unauthenticated).",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:28Z"
   },
   {
     "endpoint": "/get_patient_profile.php",
     "method": "POST",
     "role": "patient",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "IDOR",
-    "note": "Vulnerable: Accessed another user's data record directly.",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:28Z"
   },
   {
     "endpoint": "/submit_abg.php",
     "method": "POST",
     "role": "unauthenticated",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "AuthN Bypass",
-    "note": "Vulnerable: Protected endpoint allowed access with just an ID (unauthenticated).",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/submit_abg.php",
     "method": "POST",
     "role": "patient",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "IDOR",
-    "note": "Vulnerable: Accessed another user's data record directly.",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/recover_patient_id.php",
@@ -140,7 +140,7 @@
     "severity": "Low",
     "test_category": "AuthN Bypass",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/recover_patient_id.php",
@@ -151,7 +151,7 @@
     "severity": "Low",
     "test_category": "IDOR",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/update_patient_status.php",
@@ -162,7 +162,7 @@
     "severity": "Low",
     "test_category": "AuthN Bypass",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/update_patient_status.php",
@@ -173,29 +173,29 @@
     "severity": "Low",
     "test_category": "IDOR",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/fetch_patient_details.php",
     "method": "POST",
     "role": "unauthenticated",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "AuthN Bypass",
-    "note": "Vulnerable: Protected endpoint allowed access with just an ID (unauthenticated).",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/fetch_patient_details.php",
     "method": "POST",
     "role": "patient",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "IDOR",
-    "note": "Vulnerable: Accessed another user's data record directly.",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/submit_appointment.php",
@@ -206,7 +206,7 @@
     "severity": "Low",
     "test_category": "AuthN Bypass",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:21Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/submit_appointment.php",
@@ -217,7 +217,7 @@
     "severity": "Low",
     "test_category": "IDOR",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/save_checkup.php",
@@ -228,7 +228,7 @@
     "severity": "Critical",
     "test_category": "AuthN Bypass",
     "note": "Vulnerable: Protected endpoint allowed access with just an ID (unauthenticated).",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/save_checkup.php",
@@ -239,7 +239,7 @@
     "severity": "Critical",
     "test_category": "IDOR",
     "note": "Vulnerable: Accessed another user's data record directly.",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/submit_six_min_walk.php",
@@ -250,7 +250,7 @@
     "severity": "Low",
     "test_category": "AuthN Bypass",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/submit_six_min_walk.php",
@@ -261,7 +261,7 @@
     "severity": "Low",
     "test_category": "IDOR",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/get_my_copd.php",
@@ -272,7 +272,7 @@
     "severity": "Low",
     "test_category": "AuthN Bypass",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/get_my_copd.php",
@@ -283,29 +283,29 @@
     "severity": "Low",
     "test_category": "IDOR",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/save_questionnaire.php",
     "method": "POST",
     "role": "unauthenticated",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "AuthN Bypass",
-    "note": "Vulnerable: Protected endpoint allowed access with just an ID (unauthenticated).",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/save_questionnaire.php",
     "method": "POST",
     "role": "patient",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "IDOR",
-    "note": "Vulnerable: Accessed another user's data record directly.",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/fetch_doctor_patients.php",
@@ -316,7 +316,7 @@
     "severity": "Critical",
     "test_category": "AuthN Bypass",
     "note": "Vulnerable: Protected endpoint allowed access with just an ID (unauthenticated).",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/fetch_doctor_patients.php",
@@ -327,7 +327,7 @@
     "severity": "High",
     "test_category": "AuthZ / Privesc",
     "note": "Vulnerable: Patient ID allowed access to Doctor-level endpoint.",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/get_doctor_profile.php",
@@ -338,7 +338,7 @@
     "severity": "Critical",
     "test_category": "AuthN Bypass",
     "note": "Vulnerable: Protected endpoint allowed access with just an ID (unauthenticated).",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/get_doctor_profile.php",
@@ -349,51 +349,51 @@
     "severity": "Low",
     "test_category": "AuthZ / Privesc",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/get_patient_details.php",
     "method": "POST",
     "role": "unauthenticated",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "AuthN Bypass",
-    "note": "Vulnerable: Protected endpoint allowed access with just an ID (unauthenticated).",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/get_patient_details.php",
     "method": "POST",
     "role": "patient",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "IDOR",
-    "note": "Vulnerable: Accessed another user's data record directly.",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/save_vaccine_dates.php",
     "method": "POST",
     "role": "unauthenticated",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "AuthN Bypass",
-    "note": "Vulnerable: Protected endpoint allowed access with just an ID (unauthenticated).",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/save_vaccine_dates.php",
     "method": "POST",
     "role": "patient",
     "status": 200,
-    "finding": true,
-    "severity": "Critical",
+    "finding": false,
+    "severity": "Low",
     "test_category": "IDOR",
-    "note": "Vulnerable: Accessed another user's data record directly.",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "note": "No vulnerability detected",
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/save_copd_questionnaire.php",
@@ -404,7 +404,7 @@
     "severity": "Low",
     "test_category": "AuthN Bypass",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/save_copd_questionnaire.php",
@@ -415,7 +415,7 @@
     "severity": "Low",
     "test_category": "IDOR",
     "note": "No vulnerability detected",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/get_patients.php",
@@ -426,7 +426,7 @@
     "severity": "Critical",
     "test_category": "AuthN Bypass",
     "note": "Vulnerable: Protected endpoint allowed access with just an ID (unauthenticated).",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   },
   {
     "endpoint": "/get_patients.php",
@@ -437,6 +437,6 @@
     "severity": "High",
     "test_category": "AuthZ / Privesc",
     "note": "Vulnerable: Patient ID allowed access to Doctor-level endpoint.",
-    "timestamp": "2026-06-09T10:14:22Z"
+    "timestamp": "2026-08-05T05:37:29Z"
   }
 ]

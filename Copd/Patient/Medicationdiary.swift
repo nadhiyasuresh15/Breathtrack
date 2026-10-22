@@ -592,7 +592,48 @@ private struct MedicationCard: View {
     
     private func checkInhalerStatus() {
         let dateString = DateFormatter.localizedString(from: Date(), dateStyle: .short, timeStyle: .none)
-        isTakenToday = UserDefaults.standard.bool(forKey: "inhaler_taken_\(currentPatientId)_\(dateString)")
+        let localTaken = UserDefaults.standard.bool(forKey: "inhaler_taken_\(currentPatientId)_\(dateString)")
+        if localTaken {
+            isTakenToday = true
+            return
+        }
+
+        // Query server for historical taken dates to sync (e.g. if done on web)
+        guard !currentPatientId.isEmpty, currentPatientId != "unknown" else { return }
+        guard let url = APIConfig.getURL(for: "get_inhaler_history.php") else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let body: [String: Any] = ["patient_id": currentPatientId]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data, error == nil else { return }
+
+            struct HistoryResponse: Codable {
+                let status: String
+                let taken_dates: [String]?
+            }
+
+            if let decoded = try? JSONDecoder().decode(HistoryResponse.self, from: data),
+               decoded.status == "success",
+               let dates = decoded.taken_dates {
+
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd"
+                let todayStr = formatter.string(from: Date())
+
+                if dates.contains(todayStr) {
+                    DispatchQueue.main.async {
+                        withAnimation(.spring()) {
+                            isTakenToday = true
+                            UserDefaults.standard.set(true, forKey: "inhaler_taken_\(currentPatientId)_\(dateString)")
+                        }
+                    }
+                }
+            }
+        }.resume()
     }
 }
 
